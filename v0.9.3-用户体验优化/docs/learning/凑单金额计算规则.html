@@ -1,0 +1,153 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>凑单金额计算规则</title><style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Microsoft YaHei",sans-serif;color:#24282d;background:#f6f6f2;line-height:1.85;font-synthesis:none}*{box-sizing:border-box}body{margin:0}main{max-width:1120px;margin:32px auto;padding:48px 52px;background:#fff;border:1px solid #e8e8df;border-radius:18px}nav{display:flex;gap:20px;flex-wrap:wrap;font-size:13px;margin-bottom:32px;border-bottom:1px solid #eee;padding-bottom:18px}a{color:#956d08;text-underline-offset:3px}h1{font-size:32px;line-height:1.4;letter-spacing:-.6px;margin-top:0}h2{font-size:23px;margin:42px 0 16px;border-left:5px solid #ffd428;padding-left:13px}h3{font-size:18px;margin:26px 0 12px}p{margin:12px 0}table{border-collapse:collapse;width:100%;font-size:13px;line-height:1.75;margin:18px 0;table-layout:auto}th,td{border:1px solid #e7e7dd;text-align:left;vertical-align:top;padding:11px 13px}th{background:#fff8d7;font-weight:650}tr:nth-child(even) td{background:#fcfcfa}img{max-width:100%;height:auto;border-radius:8px}td img{margin-top:12px;max-height:650px;object-fit:contain}pre{overflow:auto;background:#f6f6f2;border-radius:8px;padding:18px;font-size:12px;line-height:1.6}code{background:#f5f5ef;padding:2px 5px;border-radius:4px;font-size:.9em}pre code{background:none;padding:0}details{background:#fafaf6;border:1px solid #eee;border-radius:8px;padding:12px 16px;margin:18px 0}summary{cursor:pointer;font-size:13px;color:#777}li{margin:5px 0}footer{margin-top:38px;padding-top:18px;border-top:1px solid #eee;color:#888;font-size:12px}@media(max-width:700px){main{margin:0;padding:28px 18px;border:0;border-radius:0}h1{font-size:26px}table{font-size:11px}th,td{padding:8px}nav{gap:12px}}@media print{body{background:white}main{margin:0;padding:0;border:0;max-width:none}nav,details{display:none}h2,h3{break-after:avoid}tr,img{break-inside:avoid}a{color:inherit}}
+</style></head><body><main><nav><a href="../../项目说明.html">项目说明</a><a href="../../无人机选购优化原型.html">交互原型</a><a href="../../PRD-用户体验优化.html">PRD</a><a href="../../design/exception-states/index.html">异常状态图集</a><a href="../../docs/项目思考与迭代复盘.html">设计复盘</a></nav><h1>凑单金额计算规则</h1>
+<p>本稿补充凑单助手的金额口径、计算方式和信息来源。范围为同店凑单，普通用户包含普通新客，不增加会员和优惠券规则。</p>
+<h2>1. 金额口径</h2>
+<table>
+<thead>
+<tr>
+<th>金额</th>
+<th>用途</th>
+<th>本版口径</th>
+<th>待业务确认</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>商品价格</td>
+<td>展示、筛选、本次加购</td>
+<td>当前规格单价，含配置的付费规格与加料</td>
+<td>普通折扣、数量是否改变单价</td>
+</tr>
+<tr>
+<td>起送统计金额</td>
+<td>差额、进度、达标判断</td>
+<td>本店商品合计，不含包装费、配送费</td>
+<td>折前／折后、加料及包装是否计入</td>
+</tr>
+<tr>
+<td>最终应付</td>
+<td>结算</td>
+<td>助手不另行计算</td>
+<td>以结算结果为准</td>
+</tr>
+</tbody>
+</table>
+<p>起送统计的业务口径尚需确认。当前版本按店内商品金额计算；接入时需要明确商品展示价格与起送统计金额是否相同。</p>
+<h2>2. 金额计算</h2>
+<p>金额用整数分计算，显示为元，最多保留两位小数。</p>
+<ul>
+<li>单行金额 = 当前规格单价 × 数量。</li>
+<li>C = 本店实际购物车商品行金额之和。</li>
+<li>D = 助手已勾选商品行金额之和。</li>
+<li>P = C + D，为预览金额；其他门店不参与。</li>
+<li>T为起送门槛；差额 G = max(0, T − P)。</li>
+<li>T &gt; 0时，进度 = min(100%, max(0%, P ÷ T × 100%))。</li>
+<li>有效T = 0表示无金额门槛；缺失、负数或非数字不能按0处理。</li>
+</ul>
+<p>P ≥ T且购买校验通过才能提示“加购后可达起送价”。预览达标不代表实际加入成功。有有效选择即可确认加购，不要求一次凑满。成功后按实际购物车重算，仍不足时保留该店入口，实际达标后才移除。</p>
+<h2>3. 筛选与推荐</h2>
+<p>筛选按当前规格单件价，不按多杯小计。边界为：低于5元、5≤价格&lt;10、10≤价格&lt;15、15≤价格&lt;20、20≤价格&lt;25、价格≥25。5元归5–10，25元归25元及以上。
+推荐不计算最优组合：可购买商品优先；其中一件能补足打开助手时差额的商品按价格升序优先，其余保留目录顺序。操作期间固定顺序，避免商品跳动；重新打开可按最新购物车排序。后续可以按实际业务需求进行补充和推荐顺序调整。</p>
+<p>切换筛选保留选择，被隐藏的已选商品仍计入D。“自己选”清空未提交草稿。无价位匹配商品时商品区留空；有匹配商品但受限时保留置灰行和原因。</p>
+<h2>4. 重算和提交</h2>
+<table>
+<thead>
+<tr>
+<th>触发</th>
+<th>处理</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>勾选／取消、增减数量、改规格</td>
+<td>更新D、P、G和进度，不改实际购物车</td>
+</tr>
+<tr>
+<td>切换筛选</td>
+<td>只改变可见列表，不改金额和选择</td>
+</tr>
+<tr>
+<td>实际购物车变化</td>
+<td>更新C，重新校验草稿和金额</td>
+</tr>
+<tr>
+<td>加购成功</td>
+<td>按实际写入结果更新C，清除已提交草稿，避免重复累计</td>
+</tr>
+<tr>
+<td>明确失败且确认未写入</td>
+<td>保留草稿和原购物车，允许重试</td>
+</tr>
+<tr>
+<td>超时、结果未知</td>
+<td>先核对实际结果，不重复提交整批商品</td>
+</tr>
+<tr>
+<td>单价或门槛缺失</td>
+<td>不用0补值，不承诺差额或达标</td>
+</tr>
+</tbody>
+</table>
+<p>确认前价格／规则变化时应更新金额并让用户重新确认，当前原型未实现真实动态价格核对，同规格合并时沿用原购物车行单价。</p>
+<h2>5. 需要的信息和来源</h2>
+<p>以下是需求信息。</p>
+<table>
+<thead>
+<tr>
+<th>信息</th>
+<th>用途</th>
+<th>预期来源</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>门店标识、门槛及统计口径</td>
+<td>按店计算</td>
+<td>门店／交易业务确认；演示为本地配置</td>
+</tr>
+<tr>
+<td>购物车商品、规格、数量及起送统计金额</td>
+<td>确定C</td>
+<td>购物车能力；演示为浏览器本地数据</td>
+</tr>
+<tr>
+<td>候选商品当前规格价格</td>
+<td>展示、筛选、计算D</td>
+<td>商品与价格能力；演示为本地配置</td>
+</tr>
+<tr>
+<td>单品／组合是否可加、受限原因</td>
+<td>控制加号与确认</td>
+<td>购买规则校验；不通过价格或重量猜测</td>
+</tr>
+<tr>
+<td>草稿选择、规格、数量</td>
+<td>管理未提交内容</td>
+<td>用户本次操作生成</td>
+</tr>
+<tr>
+<td>写入结果、最新购物车</td>
+<td>判断实际成功</td>
+<td>购物车写入与核对能力，真实方式待确认</td>
+</tr>
+<tr>
+<td>商品与价格版本或更新时间</td>
+<td>识别变化</td>
+<td>与业务、研发确认可提供方式</td>
+</tr>
+</tbody>
+</table>
+<h2>6. 算例</h2>
+<p>起送17元，实际已有柠檬水5.20元：差额11.80元，进度30.59%。勾选12元商品后，草稿12元、预览17.20元、差额0、进度100%；确认前实际购物车仍是5.20元。取消勾选恢复原差额。确认成功后实际购物车17.20元，草稿清零。</p>
+<p>其他门店即使已有20元也不减少本店差额。金额够但组合校验失败仍不可确认加购。</p>
+<h2>7. 定稿前待确认</h2>
+<ol>
+<li>起送按折前还是折后统计，规格差价、加料、包装费是否参与。</li>
+<li>数量变化是否影响价格，折扣限份后能否原价购买。</li>
+<li>门槛是否随配送方式、时段或活动变化。</li>
+<li>商品、价格、购买限制能否提前取得并在提交时重新校验。</li>
+<li>批量加购是否可能部分成功以及如何核对实际写入结果。</li>
+</ol>
+<p>接口取得方式在接入前确认；本次范围不涉涉及会员、优惠券和配送业务。</p>
+<footer>用户体验优化 · 无人机专区 · V0.9.3</footer></main></body></html>

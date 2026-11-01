@@ -1,0 +1,595 @@
+/* 选购增强；沿用主原型的字号、黄色主操作与白色弹层。 */
+
+.mobile-reset { display: none !important; }
+
+.purchase-state {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  margin-top: 6px;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #6d8d76;
+}
+.purchase-state[hidden] { display: none; }
+.purchase-state::before {
+  content: '';
+  width: 4px;
+  height: 4px;
+  margin-top: 5px;
+  border-radius: 50%;
+  background: #80a48a;
+  flex: 0 0 4px;
+}
+.purchase-state.available { color: #5a8766; }
+.purchase-state.blocked { color: #8c8c8c; }
+.purchase-state.blocked::before { background: #aaa; }
+.purchase-state.unknown { color: #a1a1a1; }
+.purchase-state.unknown::before { background: #c5c5c5; }
+.spec-modal .purchase-state { margin: 5px 16px 0; }
+.quantity button:disabled,
+.quantity .plus:disabled,
+.quantity .plus.disabled,
+.quantity .plus[aria-disabled='true'] {
+  color: #b7b7b7;
+  border-color: #e8e8e8;
+  background: #ededed;
+}
+.spec-bottom .add-button:disabled,
+.spec-bottom .add-button.disabled {
+  color: #aaa;
+  background: #eaeaea;
+}
+.product-card.topup-highlight {
+  animation: topup-attention 1.2s ease-out 1;
+  border-radius: 9px;
+}
+@keyframes topup-attention {
+  0% { background: #fffbe3; box-shadow: 0 0 0 1px #e8d152; }
+  35% { background: #fff6c5; box-shadow: 0 0 0 1px #e0c338; }
+  100% { background: transparent; box-shadow: 0 0 0 1px transparent; }
+}
+
+.topup-entry-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 37px;
+  padding: 6px 13px;
+  background: #fff8e8;
+  border-bottom: 1px solid #fff2d5;
+}
+.topup-entry-bar .gap-copy {
+  flex: 1;
+  min-width: 0;
+  font-size: 11px;
+  color: #9a825c;
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.topup-entry-bar .gap-copy strong,
+.topup-entry-bar .gap-copy b {
+  color: #df7b2c;
+  font-weight: 600;
+}
+.topup-entry-bar .gap-copy em {
+  color: #df7b2c;
+  font-style: normal;
+}
+.topup-entry-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-height: 25px;
+  padding: 3px 10px;
+  border: 1px solid #dfbf57;
+  border-radius: 15px;
+  background: #fffdf5;
+  color: #ae862a;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.topup-assistant-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+  padding: 6px 10px 7px;
+  background: #fff;
+}
+.topup-assistant-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: 16px 19px;
+  align-items: center;
+  column-gap: 5px;
+  min-width: 0;
+  padding: 4px 8px;
+  border: 1px solid #f3e9d5;
+  border-radius: 7px;
+  background: #fffaf0;
+  text-align: left;
+}
+.topup-assistant-card:only-child { grid-column: 1 / -1; }
+.topup-assistant-card.active { border-color: #e8ce70; background: #fff8df; }
+.topup-assistant-card:focus-visible { outline: 2px solid #d6b743; outline-offset: 1px; }
+.topup-assistant-store {
+  grid-column: 1 / -1;
+  min-width: 0;
+  overflow: hidden;
+  color: #504b3e;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.topup-assistant-gap { color: #9a825c; font-size: 10px; line-height: 19px; white-space: nowrap; }
+.topup-assistant-gap strong { color: #df7b2c; font-size: 11px; font-weight: 700; }
+.topup-assistant-action { color: #ad852b; font-size: 9px; font-weight: 600; line-height: 19px; white-space: nowrap; }
+.cart-store .topup-entry-bar {
+  margin: 0 14px 4px;
+  padding: 6px 9px;
+  border: 0;
+  border-radius: 6px;
+}
+.cart-store-head .remove-store-button {
+  display: inline-grid;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  margin-right: -5px;
+  color: #9b9b9b;
+  flex: 0 0 29px;
+  border-radius: 6px;
+}
+.remove-store-button:hover { background: #f7f7f7; }
+.remove-store-button svg { width: 16px; height: 16px; }
+
+/* 助手内容在 sheet 内滚动，底部确认操作保留。 */
+.topup-sheet {
+  height: min(700px, 82%);
+  max-height: 82%;
+  padding-bottom: 0;
+  background: #fff;
+  border-radius: 21px 21px 0 0;
+  overflow: hidden;
+  color: #252525;
+}
+.tau-grab {
+  width: 33px;
+  height: 4px;
+  margin: 9px auto 4px;
+  background: #dedede;
+  border-radius: 8px;
+  flex: 0 0 4px;
+}
+.tau-head {
+  padding: 6px 16px 13px;
+  flex-shrink: 0;
+}
+.tau-head-row { display: flex; align-items: center; gap: 13px; }
+.tau-head-row h2 {
+  min-width: 0;
+  flex: 1;
+  font-size: 20px;
+  letter-spacing: -.7px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.tau-head-row button {
+  flex-shrink: 0;
+  color: #929292;
+  font-size: 12px;
+  line-height: 24px;
+  white-space: nowrap;
+}
+.tau-head-row button:last-child {
+  min-width: 22px;
+  min-height: 25px;
+  color: #aaa;
+}
+.tau-head-row .close-button { font-size: 25px; line-height: 25px; }
+.tau-head-row button svg { width: 17px; height: 17px; }
+.tau-store {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 5px;
+  color: #999;
+  font-size: 11px;
+  line-height: 1.5;
+  min-width: 0;
+}
+.tau-store img { width: 14px; height: 14px; border-radius: 2px; flex-shrink: 0; }
+.tau-store span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tau-summary {
+  margin: 0 12px 13px;
+  padding: 12px 13px 11px;
+  background: #fffae5;
+  border-radius: 11px;
+  flex-shrink: 0;
+}
+.tau-summary-main {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+  line-height: 1.2;
+  min-height: 34px;
+}
+.tau-summary.is-ready .tau-summary-main > span:first-child { color: #4f805e; font-size: 17px; font-weight: 650; }
+.tau-summary.is-blocked .tau-summary-main > span:first-child { color: #b57c5a; font-size: 17px; font-weight: 650; }
+.tau-summary-main > span { font-size: 13px; }
+.tau-summary-main strong {
+  margin: 0 2px;
+  color: #df8126;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -.9px;
+}
+.tau-summary-main strong small { font-size: 16px; font-weight: 650; letter-spacing: 0; }
+.tau-summary-main > small,
+.tau-summary-main > span:last-child {
+  margin-left: auto;
+  color: #a99764;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.tau-progress {
+  height: 4px;
+  margin: 9px 0 7px;
+  background: #efead2;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.tau-progress i {
+  display: block;
+  height: 100%;
+  background: #f0cc25;
+  border-radius: 10px;
+  transition: width 200ms ease-out;
+}
+.tau-summary-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: #a49670;
+  font-size: 10px;
+  line-height: 1.5;
+}
+.tau-summary-caption > :first-child { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.tau-summary-caption > :last-child { flex-shrink: 0; white-space: nowrap; }
+.tau-section-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 15px 11px;
+  min-height: 31px;
+  flex-shrink: 0;
+}
+.tau-section-head h3 {
+  display: inline-flex;
+  align-items: center;
+  min-height: 27px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  background: #fff7dd;
+  color: #bc8f25;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.tau-section-head > span,
+.tau-section-head > button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 25px;
+  padding: 4px 11px;
+  border-radius: 6px;
+  background: #fff7dd;
+  color: #bc8f25;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* 金额区间只筛选商品，选择状态始终留在同一张弹层中。 */
+.tau-catalog-content,
+.tau-complete-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+}
+.tau-catalog-content[hidden],
+.tau-complete-content[hidden] { display: none; }
+.tau-price-tabs {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  margin: 0 0 9px;
+  padding: 0 12px 6px;
+  flex: 0 0 auto;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  scroll-padding-inline: 12px;
+}
+.tau-price-tabs::-webkit-scrollbar { display: none; }
+.tau-price-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 29px;
+  padding: 5px 12px;
+  flex: 0 0 auto;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: #f5f5f5;
+  color: #8b8b8b;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+.tau-price-tab.active {
+  border-color: #f9ecc1;
+  background: #fff7df;
+  color: #b28b25;
+  font-weight: 650;
+}
+.tau-price-tab:focus-visible { outline: 2px solid #d5b33b; outline-offset: -2px; }
+.tau-products-scroll {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  padding: 0 12px 10px;
+}
+.tau-products-scroll::-webkit-scrollbar { display: none; }
+.tau-product {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding: 12px 11px;
+  border: 1px solid #ededed;
+  border-radius: 11px;
+  background: #fff;
+  transition: border-color 120ms, background 120ms;
+}
+.tau-product[hidden] { display: none; }
+.tau-product.selected {
+  border-color: #edcd25;
+  background: #fffdf3;
+  box-shadow: inset 0 0 0 .5px #edcd25;
+}
+.tau-product.blocked:not(.selected) { background: #fcfcfc; }
+.tau-product-body { min-width: 0; flex: 1; }
+.tau-product-check {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  border: 1px solid #d6d6d6;
+  border-radius: 5px;
+  background: #fff;
+  color: #333;
+  font-size: 12px;
+  line-height: 1;
+  margin-top: 24px;
+}
+.tau-product-check svg { width: 11px; height: 11px; visibility: hidden; }
+.tau-product.selected .tau-product-check { border-color: var(--yellow); background: var(--yellow); }
+.tau-product.selected .tau-product-check svg { visibility: visible; }
+.tau-product-check:disabled { border-color: #e7e7e7; background: #f2f2f2; color: #bdbdbd; }
+.tau-product[aria-disabled='true']:not(.selected) .tau-product-check { border-color: #e7e7e7; background: #f2f2f2; color: #bdbdbd; }
+.tau-product-check:focus-visible { outline: 2px solid #d5b33b; outline-offset: 3px; }
+.tau-product:focus-visible { outline: 2px solid #d5b33b; outline-offset: -2px; }
+.tau-product .tau-item { align-items: flex-start; }
+.tau-product .tau-image { width: 63px; height: 68px; flex-basis: 63px; }
+.tau-product .tau-name { font-size: 13px; line-height: 1.5; }
+.tau-product .tau-options { min-height: 20px; margin-top: 3px; }
+.tau-product .tau-qty { gap: 8px; margin-top: 7px; }
+.tau-product .tau-qty button { width: 22px; height: 22px; line-height: 19px; }
+.tau-product .tau-item-actions { flex: 0 0 auto; min-width: 50px; }
+.tau-product .tau-add {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin: 2px -5px -5px auto;
+  padding: 0;
+  border: 5px solid transparent;
+  border-radius: 50%;
+  background: var(--yellow);
+  background-clip: padding-box;
+  color: #333;
+  font-size: 16px;
+  line-height: 20px;
+}
+.tau-product .tau-add:disabled {
+  border-color: transparent;
+  background-color: #f0f0f0;
+  color: #c5c5c5;
+}
+.tau-product .tau-add:focus-visible { outline: 2px solid #d5b33b; outline-offset: 1px; }
+.tau-product-subtotal { margin-top: 7px; color: #ba8c49; font-size: 10px; line-height: 1.5; text-align: right; }
+.tau-product .tau-plan-status,
+.tau-product-status,
+.tau-product-reason {
+  margin-top: 5px;
+  color: #a18b76;
+  font-size: 10px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.tau-catalog-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  min-height: 160px;
+  padding: 30px 18px;
+  color: #aaa;
+  text-align: center;
+}
+.tau-catalog-empty[hidden] { display: none; }
+.tau-catalog-empty svg { margin-bottom: 11px; color: #c4c0b2; }
+.tau-catalog-empty h3 { color: #777; font-size: 14px; font-weight: 500; line-height: 1.8; }
+.tau-catalog-empty p { margin-top: 5px; font-size: 11px; line-height: 1.8; }
+.tau-catalog-empty button { margin-top: 15px; padding: 7px 17px; border-radius: 18px; background: #fff7df; color: #ae8b35; font-size: 11px; }
+.tau-plans {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  padding: 0 12px 10px;
+}
+.tau-plans::-webkit-scrollbar { display: none; }
+.tau-plan {
+  margin-bottom: 10px;
+  padding: 10px 11px 9px;
+  border: 1px solid #eaeaea;
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color .12s, background .12s;
+}
+.tau-plan.selected { border-color: #f1ce22; background: #fffdf2; box-shadow: inset 0 0 0 .5px #f1ce22; }
+.tau-plan.blocked:not(.selected) { background: #fcfcfc; }
+.tau-plan:focus-visible { outline: 2px solid #d2b841; outline-offset: 2px; }
+.tau-plan-head { display: flex; align-items: center; gap: 6px; margin-bottom: 9px; min-height: 18px; }
+.tau-plan-head > b,
+.tau-plan-head > strong,
+.tau-plan-head > h3 { font-size: 12px; font-weight: 650; line-height: 1.5; }
+.tau-plan-head > small { padding: 2px 4px; border-radius: 3px; background: #fff7da; color: #b99037; font-size: 9px; }
+.tau-check {
+  margin-left: auto;
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1px solid #d6d6d6;
+  border-radius: 5px;
+  background: #fff;
+  flex: 0 0 18px;
+  color: #333;
+  font-size: 12px;
+  line-height: 1;
+}
+.tau-check svg { width: 11px; height: 11px; visibility: hidden; }
+.tau-plan.selected .tau-check { background: var(--yellow); border-color: var(--yellow); }
+.tau-plan.selected .tau-check svg { visibility: visible; }
+.tau-item { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.tau-item + .tau-item { margin-top: 8px; }
+.tau-image { width: 57px; height: 57px; border-radius: 7px; flex: 0 0 57px; object-fit: cover; }
+.tau-item-main { min-width: 0; flex: 1; }
+.tau-name { margin: 0; font-size: 14px; font-weight: 650; line-height: 1.45; }
+.tau-options {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  margin-top: 5px;
+  color: #999;
+  font-size: 10px;
+  line-height: 1.45;
+  text-align: left;
+  white-space: normal;
+}
+.tau-options svg { width: 9px; height: 9px; color: #aaa; }
+.tau-price { font-size: 16px; font-weight: 650; white-space: nowrap; text-align: right; }
+.tau-price small { font-size: 10px; font-weight: 500; color: #aaa; }
+.tau-price > span { margin-left: 4px; font-size: 10px; font-weight: 400; color: #aaa; }
+.tau-qty { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 6px; white-space: nowrap; }
+.tau-qty button { width: 20px; height: 20px; border: 1px solid #dedede; border-radius: 50%; background: #fff; color: #888; font-size: 16px; line-height: 17px; }
+.tau-qty button:last-child { background: var(--yellow); border-color: var(--yellow); color: #333; }
+.tau-qty button:disabled { color: #c5c5c5; border-color: #eee; background: #f8f8f8; }
+.tau-qty span { min-width: 8px; text-align: center; font-size: 11px; }
+.tau-plan:has(.tau-item + .tau-item) .tau-image { width: 44px; height: 44px; flex-basis: 44px; }
+.tau-plan:has(.tau-item + .tau-item) .tau-name { font-size: 12px; }
+.tau-plan:has(.tau-item + .tau-item) .tau-qty { gap: 6px; margin-top: 4px; }
+.tau-result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid #f2f2ed;
+  font-size: 10px;
+  line-height: 1.5;
+  color: #999;
+}
+.tau-result > strong { color: #ef7f2d; font-size: 13px; font-weight: 650; white-space: nowrap; }
+.tau-result em { max-width: 75%; color: #4f805e; font-style: normal; text-align: right; }
+.tau-plan-status { display: block; margin-top: 5px; font-size: 10px; color: #72947d; line-height: 1.5; }
+.tau-plan.blocked .tau-plan-status { color: #b57e55; }
+.tau-footer { flex-shrink: 0; padding: 11px 16px max(24px, env(safe-area-inset-bottom)); border-top: 1px solid #f3f3f3; background: #fff; }
+.tau-footer-row { display: flex; align-items: center; justify-content: space-between; gap: 7px; min-height: 43px; }
+.tau-footer-row > span { color: #a3a3a3; font-size: 12px; }
+.tau-footer-label { margin-bottom: 4px; color: #999; font-size: 10px; }
+.tau-footer-money { color: #ee6250; font-size: 25px; font-weight: 700; letter-spacing: -.6px; line-height: 1.15; white-space: nowrap; }
+.tau-footer-money small { font-size: 13px; letter-spacing: 0; }
+.tau-footer-money span { margin-left: 7px; color: #999; font-size: 11px; font-weight: 400; letter-spacing: 0; }
+.tau-confirm { height: 43px; min-width: 142px; padding: 0 21px; border-radius: 25px; background: var(--yellow); font-size: 14px; font-weight: 650; white-space: nowrap; flex-shrink: 0; }
+.tau-confirm:disabled { color: #fff; background: #e7e7e7; }
+.tau-footer-hint { margin-top: 7px; min-height: 14px; color: #4f805e; font-size: 10px; line-height: 1.5; }
+.tau-footer-hint.error { color: #b57c5a; }
+.tau-empty,
+.tau-success { flex: 1; min-height: 0; overflow-y: auto; text-align: center; padding: 30px 22px; }
+.tau-empty h3,
+.tau-success h3 { font-size: 19px; line-height: 1.5; margin: 9px 0; }
+.tau-empty p,
+.tau-success p { color: #999; font-size: 12px; line-height: 1.9; }
+.tau-empty button { margin-top: 18px; padding: 8px 19px; background: #fff9dc; color: #a2822d; border-radius: 20px; font-size: 12px; }
+.tau-success-icon { display: grid; place-items: center; width: 54px; height: 54px; margin: 8px auto 15px; border-radius: 50%; background: #ffed74; }
+.tau-success-icon svg { width: 26px; height: 26px; }
+.tau-success img { width: 58px; height: 58px; border-radius: 8px; margin: 20px auto 9px; }
+.tau-receipt { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+.tau-receipt > div { width: 88px; min-width: 0; }
+.tau-receipt img { margin-top: 12px; }
+.tau-receipt span { display: block; color: #999; font-size: 10px; line-height: 1.5; overflow-wrap: anywhere; }
+
+@media (max-width: 390px) {
+  .topup-entry-bar { padding-left: 11px; padding-right: 11px; gap: 8px; }
+  .topup-entry-bar .gap-copy { font-size: 10px; }
+  .topup-entry-button { padding-left: 9px; padding-right: 9px; font-size: 10px; }
+  .tau-head { padding-left: 15px; padding-right: 15px; }
+  .tau-summary { margin-left: 11px; margin-right: 11px; padding-left: 12px; padding-right: 12px; }
+  .tau-plans { padding-left: 11px; padding-right: 11px; }
+  .tau-plan { padding-left: 10px; padding-right: 10px; }
+  .tau-price-tabs { padding-left: 11px; padding-right: 11px; }
+  .tau-products-scroll { padding-left: 11px; padding-right: 11px; }
+  .tau-product { padding-left: 10px; padding-right: 10px; }
+  .tau-confirm { min-width: 134px; padding-left: 17px; padding-right: 17px; }
+  .tau-footer { padding-left: 15px; padding-right: 15px; }
+  .topup-assistant-list { padding-left: 8px; padding-right: 8px; gap: 4px; }
+  .topup-assistant-card { padding-left: 6px; padding-right: 6px; column-gap: 3px; }
+  .topup-assistant-gap { font-size: 9px; }
+  .topup-assistant-gap strong { font-size: 10px; }
+  .topup-assistant-action { font-size: 8px; }
+}
+@media (max-height: 730px) {
+  .topup-sheet { height: 85%; max-height: 85%; }
+  .tau-summary { padding-top: 10px; padding-bottom: 9px; margin-bottom: 10px; }
+  .tau-head { padding-bottom: 10px; }
+  .tau-footer { padding-top: 9px; padding-bottom: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .product-card.topup-highlight { animation: none; background: #fffbe5; box-shadow: 0 0 0 1px #e5ca42; }
+  .tau-plan, .tau-product, .tau-progress i { transition: none; }
+}
